@@ -9,25 +9,15 @@ include('function.php');
 $dataColeta = validaDiaUtil($hoje);
 
 // URL do WSDL e do serviço SOAP
-$wsdl = 'https://ssw.inf.br/ws/sswColeta/index.php?wsdl';
-$serviceUrl = 'https://ssw.inf.br/ws/sswColeta/index.php';
+$wsdl = 'https://ssw.inf.br/ws/sswCotacaoColeta/index.php?wsdl';
+$serviceUrl = 'https://ssw.inf.br/ws/sswCotacaoColeta/index.php';
 
 // Captura os dados JSON enviados na requisição POST
 $jsonData = file_get_contents('php://input');
 
 $requestData = json_decode($jsonData, true);
 
-$requestData['limiteColeta'] = $dataColeta;
-
-$cnpj_remetente = limparCaracteres($requestData['cnpjRemetente']);
-$cnpj_destinatario = limparCaracteres($requestData['cnpjDestinatario']);
-$cep_entrega = limparCaracteres($requestData['cepEntrega']);
-$cep_destino = limparCaracteres($requestData['cepDestino']);
-$valorMercadoria = validarPontosEValores($requestData['valorMercadoria']);
-
-// $volume = $requestData['quantidade'] * $requestData['altura'] * $requestData['largura'] * $requestData['comprimento'];
-
-$observacao = $requestData['material'] . " - " . $requestData['embalagem'];
+$limiteColeta = $dataColeta . $requestData['limiteColeta'];
 
 // Verifica se o JSON foi recebido corretamente
 if ($requestData) {
@@ -40,23 +30,12 @@ if ($requestData) {
         <dominio xsi:type="xsd:string">{$requestData['dominio']}</dominio>
         <login xsi:type="xsd:string">{$requestData['login']}</login>
         <senha xsi:type="xsd:string">{$requestData['senha']}</senha>
-        <cnpjRemetente xsi:type="xsd:string">{$cnpj_remetente}</cnpjRemetente>
-        <cnpjDestinatario xsi:type="xsd:string">{$cnpj_destinatario}</cnpjDestinatario>
-        <numeroNF xsi:type="xsd:string">{$requestData['numeroNF']}</numeroNF>
-        <tipoPagamento xsi:type="xsd:string">{$requestData['tipoPagamento']}</tipoPagamento>
-        <enderecoEntrega xsi:type="xsd:string">{$requestData['enderecoEntrega']}</enderecoEntrega>
-        <cepEntrega xsi:type="xsd:integer">{$cep_entrega}</cepEntrega>
-        <solicitante xsi:type="xsd:string">{$requestData['solicitante']}</solicitante>
-        <limiteColeta xsi:type="xsd:datetime">{$requestData['limiteColeta']}</limiteColeta>
-        <quantidade xsi:type="xsd:integer">{$requestData['quantidade']}</quantidade>
-        <peso xsi:type="xsd:decimal">{$requestData['peso']}</peso>
+        <cotacao xsi:type="xsd:integer">{$requestData['cotacao']}</cotacao>
+        <limiteColeta xsi:type="xsd:datetime">{$limiteColeta}</limiteColeta>
+        <token xsi:type="xsd:string">{$requestData['token']}</token>
+        <solicitante xsi:type="xsd:string">{$requestData['contact.name']}</solicitante>
         <observacao xsi:type="xsd:string">{$requestData['observacao']}</observacao>
-        <instrucao xsi:type="xsd:string">{$requestData['instrucao']}</instrucao>
-        <cubagem xsi:type="xsd:decimal">{$requestData['cubagem']}</cubagem>
-        <valorMercadoria xsi:type="xsd:decimal">{$valorMercadoria}</valorMercadoria>
-        <especie xsi:type="xsd:string">{$requestData['especie']}</especie>
         <chave_nfe xsi:type="xsd:string">{$requestData['chave_nfe']}</chave_nfe>
-        <cnpjSolicitante xsi:type="xsd:string">{$requestData['cnpjSolicitante']}</cnpjSolicitante>
         <nroPedido xsi:type="xsd:string">{$requestData['nroPedido']}</nroPedido>
       </urn:coletar>
    </soapenv:Body>
@@ -104,7 +83,7 @@ XML;
     $responseArray = json_decode($responseJson, true);
 
     // Adiciona o valor de $dataColeta ao array de resposta
-    $responseArray['limiteColeta'] = $dataColeta;
+    $responseArray['limiteColeta'] = $limiteColeta;
 
     // Reencoda o array de volta para JSON
     $responseJsonAtualizado = json_encode($responseArray, JSON_PRETTY_PRINT);
