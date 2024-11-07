@@ -2,6 +2,22 @@
 
 date_default_timezone_set('America/Bahia');
 
+error_reporting(0);
+
+// Defina o token de autorização esperado
+$expectedToken = "Bearer e0c6fd31-b699-46ae-95cd-efebfcd78f55";
+
+// Captura o cabeçalho "Authorization"
+$headers = apache_request_headers();
+$authHeader = $headers['Authorization'] ?? '';
+
+if ($authHeader !== $expectedToken) {
+    // Token inválido ou não fornecido
+    header('HTTP/1.1 401 Unauthorized');
+    echo json_encode(['error' => 'Token de autorização inválido']);
+    exit;
+}
+
 $hoje = date("Y-m-d H:i:s");
 
 include('function.php');
@@ -14,6 +30,12 @@ $serviceUrl = 'https://ssw.inf.br/ws/sswCotacaoColeta/index.php';
 
 // Captura os dados JSON enviados na requisição POST
 $jsonData = file_get_contents('php://input');
+
+if (!$jsonData) {
+    header('HTTP/1.1 400 Bad Request');
+    echo json_encode(['error' => 'No JSON input found in php://input']);
+    exit;
+}
 
 $requestData = json_decode($jsonData, true);
 
@@ -53,7 +75,7 @@ XML;
             ]);
 
             // Faz a solicitação SOAP personalizada
-            $response = $client->__doRequest($soapRequest, $serviceUrl, 'cotar', SOAP_1_1);
+            $response = $client->__doRequest($soapRequest, $serviceUrl, 'coletar', SOAP_1_1);
 
             // Converte a resposta XML para um objeto SimpleXMLElement
             $xml = simplexml_load_string($response);
