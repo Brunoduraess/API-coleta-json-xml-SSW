@@ -1,8 +1,8 @@
 <?php
-$dbHost = '10.10.0.239';
-$dbUsername = 'sistemas';
-$dbPassword = 'rmv*7653Gums';
-$dbName = 'transportegene03';
+$dbHost = '';
+$dbUsername = '';
+$dbPassword = '';
+$dbName = '';
 
 
 $conexao = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
